@@ -13,7 +13,7 @@
 3. Ordenação: "Conduzir os pensamentos por ordem"
 4. Revisão: "Fazer enumerações completas"
 
-🚀 Instalação
+##🚀 Instalação
 
 # 1. Clonar repositório
 git clone https://github.com/seu-usuario/experimento-cartesiano.git
@@ -25,7 +25,7 @@ pip install llama-cpp-python==0.2.23
 # 3. Baixar modelo (exemplo)
 wget -P ~/modelos https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill/resolve/main/DeepSeek-R1-Distill-Q4_K_M.gguf, ou também baixar via LLMSTUDIO.
 
-⚙️ Configuração
+##⚙️ Configuração
 
 // config_default.json
 {
@@ -41,13 +41,13 @@ wget -P ~/modelos https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill/resolve
     }
 }
 
-🧠 Funcionalidades Principais
+##🧠 Funcionalidades Principais
 - **Decomposição Automática** de questões complexas
 - **5 Ciclos de Refinamento** obrigatórios
 - **Gestão de Memória Ativa** com `gc.collect()`
 - **Saída Unificada** em formato texto/Markdown
 
-🚀 Execução
+##🚀 Execução
 
 === ANÁLISE FINAL (5 Refinamentos) ===
 [Refinamento 1] Identificação de pressupostos ocultos
@@ -62,9 +62,9 @@ python decartes_7.py \
   --pergunta "Uma máquina pode pensar?" \
   --config config_default.json
 
-📄 Exemplo de Saída
+##📄 Exemplo de Saída
 
-📜 Licença MIT
+##📜 Licença MIT
 
 Copyright 2024 Raul Campos Nascimento
 
