@@ -5,7 +5,7 @@
 ![Python](https://img.shields.io/badge/Python-3.8%2B-blue) 
 ![LLM](https://img.shields.io/badge/LLM-llama.cpp-yellow)
 
-Este projeto implementa uma análise filosófica seguindo o método cartesiano, utilizando modelos de linguagem (LLM) para processar questões complexas. O objetivo é decompor uma pergunta filosófica em subquestões elementares, gerar análises iniciais e refiná-las em vários ciclos para obter uma compreensão mais profunda do problema.
+Este experimenta busca simular de forma simplificada uma análise filosófica seguindo o método cartesiano, utilizando modelos de linguagem (LLM) para processar questões complexas. O objetivo é decompor uma pergunta filosófica em subquestões elementares, gerar análises iniciais e refiná-las em vários ciclos para obter uma compreensão mais profunda do problema.
 
 ## Estrutura do Projeto
 
