@@ -5,8 +5,46 @@
 ![Python](https://img.shields.io/badge/Python-3.8%2B-blue) 
 ![LLM](https://img.shields.io/badge/LLM-llama.cpp-yellow)
 
-Este experimenta busca simular de forma simplificada uma análise filosófica seguindo o método cartesiano, utilizando modelos de linguagem (LLM) para processar questões complexas. O objetivo é decompor uma pergunta filosófica em subquestões elementares, gerar análises iniciais e refiná-las em vários ciclos para obter uma compreensão mais profunda do problema.
+O Experimento Cartesiano Computacional é uma ponte entre o rigor metodológico de René Descartes e a potência moderna dos modelos de linguagem (LLMs). Inspirado nos quatro preceitos cartesianos — dúvida sistemática, decomposição de problemas, ordenação lógica e revisão exaustiva —, este projeto não apenas automatiza análises filosóficas, mas também explora como técnicas de Test-Time Scaling (TTS) podem transformar modelos de linguagem em ferramentas de pensamento crítico.
 
+## Nosso objetivo é duplo:
+
+    Simular o método cartesiano para decompor questões complexas em subproblemas gerenciáveis.
+
+    Capturar o "momento aha" — instantes onde otimizações em tempo de inferência (TTS) produzem saltos qualitativos no raciocínio, elevando respostas de meras conjecturas a análises estruturadas.
+
+
+### Técnicas de TTS Implementadas (Para Copiar):
+
+```python
+# Técnicas de Test-Time Scaling (TTS) no código:
+
+## 1. Temperature Scaling
+# Geração de Subquestões (método _gerar_subquestoes)
+self.modelo(prompt=..., temperature=0.8)  # Alta criatividade na decomposição
+
+# Análise Inicial (método _processar_etapas)
+self.modelo(prompt=..., temperature=0.75)  # Config JSON: balanço criatividade-coerência
+
+# Refinamentos (método _ciclo_refinamento)
+self.modelo(prompt=..., temperature=0.5)  # Baixa temperatura para respostas focadas
+
+## 2. Controle de Comprimento (max_tokens)
+# Limitação por resposta (config_default.json)
+"analise": {"max_tokens": 1024}
+
+# Resumo Automático (método _resumir_texto)
+tokens = tokenizador.encode(texto)
+tokens_resumidos = tokens[:max_tokens_contexto - 500]  # Adaptação dinâmica
+
+## 3. Refinamento Iterativo Multi-Etapas
+# Ciclos de aprimoramento (config_default.json)
+"analise": {"max_refinamentos": 10}
+
+# Loop principal:
+for ciclo in range(1, max_refinamentos+1):
+    novo_refinamento = self._ciclo_refinamento(analise_atual)
+    
 ## Estrutura do Projeto
 
 O projeto é composto pelos seguintes arquivos e diretórios:
