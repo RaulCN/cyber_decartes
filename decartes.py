@@ -3,6 +3,7 @@ import time
 import os
 from llama_cpp import Llama
 import tiktoken  # Para tokenização avançada
+import requests  # Para chamadas à API do Gemini
 
 class Configuracao:
     """Classe para carregar e gerenciar configurações do arquivo JSON."""
@@ -32,20 +33,72 @@ class Configuracao:
         with open(caminho, 'w') as f:
             json.dump(self.dados, f, indent=4)
 
+class ModeloHandler:
+    """Classe para gerenciar interações com o modelo local ou API externa."""
+    
+    def __init__(self, use_api=False, api_key=None):
+        self.use_api = use_api
+        self.api_key = api_key
+        self.modelo = None
+
+        if not self.use_api:
+            # Inicializa o modelo local (mantido no código, mas desativado)
+            self.modelo = Llama(
+                model_path="/caminho/para/modelo.gguf",  # Mantenha o caminho, mas não será usado
+                n_ctx=4096,
+                n_threads=8,
+                verbose=False
+            )
+
+    def gerar_resposta(self, prompt, max_tokens, temperatura):
+        if self.use_api:
+            # Chama a API do Gemini
+            return self._chamar_api_gemini(prompt, max_tokens, temperatura)
+        else:
+            # Mantém a estrutura do modelo local, mas não executa
+            raise Exception("Modelo local desativado. Use a API externa.")
+
+    def _chamar_api_gemini(self, prompt, max_tokens, temperatura):
+        """Faz uma chamada à API do Gemini para gerar uma resposta."""
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={self.api_key}"
+        
+        headers = {
+            "Content-Type": "application/json"
+        }
+
+        data = {
+            "contents": [
+                {
+                    "parts": [
+                        {"text": prompt}
+                    ]
+                }
+            ],
+            "generationConfig": {
+                "maxOutputTokens": max_tokens,
+                "temperature": temperatura
+            }
+        }
+
+        response = requests.post(url, headers=headers, json=data)
+        
+        if response.status_code == 200:
+            resposta = response.json()
+            return resposta["candidates"][0]["content"]["parts"][0]["text"].strip()
+        else:
+            raise Exception(f"Erro na API: {response.status_code} - {response.text}")
+
 class ExperimentoCartesiano:
     """Implementa uma análise filosófica seguindo o método cartesiano."""
     
-    def __init__(self, config_path=None):
+    def __init__(self, config_path=None, use_api=False, api_key=None):
         # Carregar configuração
         self.config = Configuracao(config_path)
         
-        # Inicializar modelo
-        modelo_config = self.config.obter("modelo")
-        self.modelo = Llama(
-            model_path=modelo_config["path"],
-            n_ctx=modelo_config["n_ctx"],
-            n_threads=modelo_config["n_threads"],
-            verbose=False
+        # Inicializar o ModeloHandler
+        self.modelo_handler = ModeloHandler(
+            use_api=use_api,
+            api_key=api_key
         )
         
         # Carregar princípios cartesianos
@@ -166,11 +219,7 @@ class ExperimentoCartesiano:
             Foco: {etapa}
             Aplicar {self.principios['duvidar']}:
             """
-            resposta = self.modelo(
-                prompt=prompt,
-                max_tokens=max_tokens,
-                temperature=temperatura
-            )['choices'][0]['text'].strip()
+            resposta = self.modelo_handler.gerar_resposta(prompt, max_tokens, temperatura)
             
             respostas.append(f"Etapa: {etapa}\nResposta: {resposta}")
             self._log(f"Resposta gerada: {resposta[:100]}...")
@@ -209,11 +258,7 @@ class ExperimentoCartesiano:
         Refinamento:"""
         
         # Gerar o refinamento
-        return self.modelo(
-            prompt=prompt,
-            max_tokens=self.config.obter("analise", "max_tokens"),
-            temperature=0.5
-        )['choices'][0]['text'].strip()
+        return self.modelo_handler.gerar_resposta(prompt, self.config.obter("analise", "max_tokens"), 0.5)
 
     def _resumir_texto(self, texto, max_tokens):
         """
@@ -249,11 +294,7 @@ class ExperimentoCartesiano:
         seguindo {self.principios['dividir']}:
         1."""
         
-        resposta = self.modelo(
-            prompt=prompt,
-            max_tokens=300,
-            temperature=0.8
-        )['choices'][0]['text'].strip()
+        resposta = self.modelo_handler.gerar_resposta(prompt, 300, 0.8)
         
         # Processa resposta do modelo
         return [f"1. {resposta.split('1.')[1]}"] + resposta.split('\n')[1:]
@@ -284,6 +325,9 @@ if __name__ == "__main__":
     parser.add_argument("--config", type=str, default=None, help="Caminho para arquivo de configuração")
     parser.add_argument("--pergunta", type=str, default="Podem as máquinas pensar?", 
                        help="Pergunta filosófica a ser analisada")
+    parser.add_argument("--use_api", action="store_true", help="Usar API externa em vez do modelo local")
+    parser.add_argument("--api_key", type=str, default=None, help="Chave da API externa")
+    
     args = parser.parse_args()
     
     try:
@@ -297,7 +341,11 @@ if __name__ == "__main__":
             args.config = config_default
                 
         # Iniciar experimento
-        experimento = ExperimentoCartesiano(args.config)
+        experimento = ExperimentoCartesiano(
+            args.config,
+            use_api=args.use_api,
+            api_key=args.api_key
+        )
         experimento.analisar(args.pergunta)
 
         print("\n=== EXECUÇÃO CONCLUÍDA ===")
